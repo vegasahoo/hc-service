@@ -14,6 +14,8 @@ spec:
     spec:
       containers:
         - name: hc-service
-          image: vegasahoo/hc-service:latest  # ✅ Your Docker Hub image
+          image: vegasahoo/hc-service:latest
           ports:
             - containerPort: 8080
+      imagePullSecrets:
+        - name: regcred
