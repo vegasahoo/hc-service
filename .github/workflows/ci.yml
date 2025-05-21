@@ -1,0 +1,64 @@
+name: Build and Dockerize Spring Boot (Gradle)
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Grant execute permission to Gradle wrapper
+        run: chmod +x ./gradlew
+
+      - name: Build JAR using Gradle
+        run: ./gradlew clean build -x test
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: spring-boot-jar
+          path: build/libs/*.jar
+
+  dockerize:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download built JAR from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: spring-boot-jar
+          path: build/libs
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set Git short SHA
+        run: echo "GIT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+
+      - name: Build Docker image with commit tag and latest
+        run: |
+          docker build -t vegasahoo/hc-service:${GIT_SHA} \
+                       -t vegasahoo/hc-service:latest .
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push vegasahoo/hc-service:${GIT_SHA}
+          docker push vegasahoo/hc-service:latest
