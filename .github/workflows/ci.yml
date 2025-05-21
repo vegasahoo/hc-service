@@ -3,10 +3,11 @@ name: Build and Dockerize
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
       - '**'
+  pull_request:
+    types: [closed]
+    branches:
+      - main
 
 jobs:
   build:
