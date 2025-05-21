@@ -2,7 +2,11 @@ name: Build and Dockerize
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
   build:
@@ -32,7 +36,7 @@ jobs:
   dockerize:
     runs-on: ubuntu-latest
     needs: build
-
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -51,7 +55,6 @@ jobs:
 
       - name: Set Git short SHA
         run: echo "GIT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
-
 
       - name: Build Docker image with commit tag and latest
         run: |
