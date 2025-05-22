@@ -66,3 +66,13 @@ jobs:
         run: |
           docker push vegasahoo/hc-service:${GIT_SHA}
           docker push vegasahoo/hc-service:latest
+  trigger-pipeline:
+    name: Trigger Harness CD Pipeline
+    needs: dockerize
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Harness Pipeline via Custom Webhook
+        run: |
+          curl -X POST -H 'Content-Type: application/json' \
+            --url 'https://app.harness.io/gateway/pipeline/api/webhook/custom/4lOuTM04Q2eo5-cZ21X_SQ/v3?accountIdentifier=B0DbaeRBTqiMAjhN0_sa9w&orgIdentifier=default&projectIdentifier=default_project&pipelineIdentifier=deploytok8s&triggerIdentifier=deployToDev' \
+            -d '{"triggered_by": "github_action", "sha": "${{ github.sha }}"}'
