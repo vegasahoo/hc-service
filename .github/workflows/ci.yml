@@ -74,5 +74,5 @@ jobs:
     steps:
       - name: Trigger Harness Pipeline via Webhook
         run: |
-          curl -X POST https://app.harness.io/gateway/pipeline/api/webhook/trigger/https://app.harness.io/gateway/ng/api/webhook?accountIdentifier=B0DbaeRBTqiMAjhN0_sa9w \
+          curl -X POST https://app.harness.io/gateway/ng/api/webhook?accountIdentifier=B0DbaeRBTqiMAjhN0_sa9w \
             -H "Content-Type: application/json"
